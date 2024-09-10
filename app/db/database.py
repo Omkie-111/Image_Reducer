@@ -1,5 +1,5 @@
-from sqlachemy import create_engine, MetaData
-from sqlachemy.orm import sessionmaker, declarative_base
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 DATABASE_URL = "sqlite:///./test.db"
 
