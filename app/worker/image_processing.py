@@ -1,4 +1,3 @@
-import os
 import aiohttp
 import asyncio
 from PIL import Image
@@ -51,7 +50,7 @@ def process_images(request_id):
     processed_images = asyncio.run(handle_images(input_urls))
     
     # Generate URLs for processed images
-    base_url = "http://localhost:8000/"
+    base_url = "https://hushed-dredi-omkie-de266b00.koyeb.app/" # for development use "http://localhost:8000/"
     output_urls = [base_url + filepath for filepath in processed_images]
     
     # Call the status update webhook
