@@ -10,7 +10,7 @@ app = FastAPI()
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to Image Extractor"}
+    return {"message": "Welcome to Image Reducer"}
 
 app.include_router(upload.router, prefix="/api")
 app.include_router(status.router, prefix="/api")
