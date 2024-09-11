@@ -17,7 +17,7 @@ This project demonstrates how to build a production-ready asynchronous image pro
 
 ## Project Structure
 ```
-Image_Reducer/
+Image_reducer/
 │
 ├── app/
 │   ├── apis/
