@@ -3,7 +3,6 @@ import asyncio
 from PIL import Image
 from io import BytesIO
 from celery import Celery
-from sqlalchemy.orm import sessionmaker
 from app.db.database import SessionLocal
 from app.db import crud
 import requests
