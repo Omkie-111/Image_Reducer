@@ -1,3 +1,4 @@
+import os
 import aiohttp
 import asyncio
 from PIL import Image
@@ -6,6 +7,9 @@ from celery import Celery
 from app.db.database import SessionLocal
 from app.db import crud
 import requests
+
+# Define the directory where processed images will be saved
+OUTPUT_DIR = 'processed_images'
 
 celery = Celery('workers')
 celery.conf.broker_url = "redis://redis:6379/0"
@@ -31,15 +35,24 @@ def process_images(request_id):
         tasks = [download_image(url) for url in urls]
         images = await asyncio.gather(*tasks)
         processed_images = []
-        for image in images:
+        for idx, image in enumerate(images):
             if image:
-                buffer = BytesIO()
-                image.save(buffer, format="JPEG", quality=50)
-                processed_images.append(buffer)
+                # Generate a unique filename for each image
+                filename = f"processed_image_{request_id}_{idx}.jpg"
+                filepath = f"{OUTPUT_DIR}/{filename}"
+                
+                # Save the image to the output directory
+                image.save(filepath, format="JPEG", quality=50)
+                
+                # Append the filepath to the list of processed images
+                processed_images.append(filepath)
         return processed_images
     
     processed_images = asyncio.run(handle_images(input_urls))
-    output_urls = ["processed_image_path"]*len(processed_images)
+    
+    # Generate URLs for processed images
+    base_url = "http://localhost:8000/"
+    output_urls = [base_url + filepath for filepath in processed_images]
     
     # Call the status update webhook
     webhook_url = "http://web:8000/api/webhook"
