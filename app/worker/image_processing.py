@@ -4,18 +4,21 @@ from PIL import Image
 from io import BytesIO
 from celery import Celery
 from sqlalchemy.orm import sessionmaker
-from db.database import engine, SessionLocal
-from db import crud, models
+from app.db.database import SessionLocal
+from app.db import crud
 import requests
 
-celery = Celery(__name__, broker='redis://localhost:6379/0')
+celery = Celery('workers')
+celery.conf.broker_url = "redis://redis:6379/0"
+celery.conf.result_backend = "redis://redis:6379/0"
 
-@celery.task
+@celery.task()
 def process_images(request_id):
-    Session = sessionmaker(bind=engine)
-    db = Session()
-    
+    db = SessionLocal()
     product = crud.get_product_by_request_id(db, request_id)
+    if not product:
+        return
+    
     input_urls = product.input_image_urls.split(',')
     
     async def download_image(url):
@@ -40,7 +43,7 @@ def process_images(request_id):
     output_urls = ["processed_image_path"]*len(processed_images)
     
     # Call the status update webhook
-    webhook_url = "http://localhost:8000/webhook/"
+    webhook_url = "http://web:8000/api/webhook"
     payload = {
         "request_id" : request_id,
         "status" : "Completed",
